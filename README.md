@@ -1,3 +1,26 @@
+# ChatGPT-4o Image Wrapper
+
+A wrapper application for ChatGPT-4o with enhanced image processing capabilities.
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Run the development server
+npm run dev
+```
+
+## Features
+- Integration with ChatGPT-4o API
+- Enhanced image processing
+- User-friendly interface
+
+## Repository
+
+This repository is available at: https://github.com/niteshme2/chatgpt-4o-image-wrapper
+
 # ChatGPT 4o Image Transformer
 
 A full-stack Next.js application for transforming images using ChatGPT's 4o image generation API. This application allows you to generate new images based on text prompts and edit existing images by either transforming them directly or creating variations.
