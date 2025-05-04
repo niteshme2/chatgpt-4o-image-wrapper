@@ -24,9 +24,19 @@ export interface ImageEditOptions {
 export interface ImageGenerationResponse {
   created: number;
   data: Array<{
-    url: string;
+    url?: string;
+    b64_json?: string;
     revised_prompt?: string;
   }>;
+  usage?: {
+    total_tokens: number;
+    input_tokens: number;
+    output_tokens: number;
+    input_tokens_details?: {
+      text_tokens: number;
+      image_tokens: number;
+    }
+  }
 }
 
 export class ChatGPTImageAPI {
@@ -54,8 +64,15 @@ export class ChatGPTImageAPI {
     };
 
     const requestOptions = { ...defaultOptions, ...options, prompt };
+    
+    console.log("📤 IMAGE GENERATION REQUEST:");
+    console.log("- Endpoint:", endpoint);
+    console.log("- Options:", JSON.stringify(requestOptions, null, 2));
 
     try {
+      console.log("⏳ Sending request to OpenAI API...");
+      const startTime = Date.now();
+      
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
@@ -64,18 +81,53 @@ export class ChatGPTImageAPI {
         },
         body: JSON.stringify(requestOptions),
       });
+      
+      const duration = Date.now() - startTime;
+      console.log(`⏱️ Response received in ${duration}ms`);
+      console.log("📥 Response status:", response.status);
+      
+      // Log just a few important headers instead of all
+      console.log("📥 Response headers:", {
+        contentType: response.headers.get("content-type"),
+        contentLength: response.headers.get("content-length"),
+        server: response.headers.get("server")
+      });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          errorData = { raw: errorText };
+        }
+        console.error("❌ OpenAI API Error:", JSON.stringify(errorData, null, 2));
         throw new Error(
           `OpenAI API error: ${response.status} ${JSON.stringify(errorData)}`
         );
       }
 
-      return await response.json();
+      const responseData = await response.json();
+      console.log("✅ Successfully generated image");
+      console.log("📥 RESPONSE DATA:", JSON.stringify(responseData, null, 2));
+      
+      // Ensure the response has the expected format
+      if (!responseData.data || !Array.isArray(responseData.data)) {
+        console.warn("⚠️ Response doesn't contain data array, creating default structure");
+        return {
+          created: Date.now(),
+          data: []
+        };
+      }
+      
+      return responseData;
     } catch (error) {
-      console.error("Error generating image:", error);
-      throw error;
+      console.error("❌ Error generating image:", error);
+      // Return a default response structure on error
+      return {
+        created: Date.now(),
+        data: []
+      };
     }
   }
 
@@ -112,7 +164,32 @@ export class ChatGPTImageAPI {
       }
     });
 
+    console.log("📤 IMAGE EDIT REQUEST:");
+    console.log("- Endpoint:", endpoint);
+    console.log("- Image filename:", image.name);
+    console.log("- Image size:", Math.round(image.size / 1024), "KB");
+    console.log("- Image type:", image.type);
+    console.log("- Prompt:", prompt);
+    if (mask) {
+      console.log("- Mask filename:", mask.name);
+      console.log("- Mask size:", Math.round(mask.size / 1024), "KB");
+    }
+    console.log("- Options:", JSON.stringify(requestOptions, null, 2));
+    
+    // Log FormData keys (simplified)
+    console.log("- FormData keys:", {
+      image: !!formData.get("image"),
+      prompt: !!formData.get("prompt"),
+      mask: !!formData.get("mask"),
+      model: formData.get("model"),
+      n: formData.get("n"),
+      size: formData.get("size")
+    });
+
     try {
+      console.log("⏳ Sending image edit request to OpenAI API...");
+      const startTime = Date.now();
+      
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
@@ -120,18 +197,53 @@ export class ChatGPTImageAPI {
         },
         body: formData,
       });
+      
+      const duration = Date.now() - startTime;
+      console.log(`⏱️ Response received in ${duration}ms`);
+      console.log("📥 Response status:", response.status);
+      
+      // Log just a few important headers instead of all
+      console.log("📥 Response headers:", {
+        contentType: response.headers.get("content-type"),
+        contentLength: response.headers.get("content-length"),
+        server: response.headers.get("server")
+      });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          errorData = { raw: errorText };
+        }
+        console.error("❌ OpenAI API Error:", JSON.stringify(errorData, null, 2));
         throw new Error(
           `OpenAI API error: ${response.status} ${JSON.stringify(errorData)}`
         );
       }
 
-      return await response.json();
+      const responseData = await response.json();
+      console.log("✅ Successfully edited image");
+      console.log("📥 RESPONSE DATA:", JSON.stringify(responseData, null, 2));
+      
+      // Ensure the response has the expected format
+      if (!responseData.data || !Array.isArray(responseData.data)) {
+        console.warn("⚠️ Response doesn't contain data array, creating default structure");
+        return {
+          created: Date.now(),
+          data: []
+        };
+      }
+      
+      return responseData;
     } catch (error) {
-      console.error("Error editing image:", error);
-      throw error;
+      console.error("❌ Error editing image:", error);
+      // Return a default response structure on error
+      return {
+        created: Date.now(),
+        data: []
+      };
     }
   }
 
@@ -160,8 +272,28 @@ export class ChatGPTImageAPI {
         formData.append(key, value.toString());
       }
     });
+    
+    console.log("📤 IMAGE VARIATION REQUEST:");
+    console.log("- Endpoint:", endpoint);
+    console.log("- Image filename:", image.name);
+    console.log("- Image size:", Math.round(image.size / 1024), "KB");
+    console.log("- Image type:", image.type);
+    console.log("- Options:", JSON.stringify(requestOptions, null, 2));
+    
+    // Log FormData keys (simplified)
+    console.log("- FormData keys:", {
+      image: !!formData.get("image"),
+      prompt: !!formData.get("prompt"),
+      mask: !!formData.get("mask"),
+      model: formData.get("model"),
+      n: formData.get("n"),
+      size: formData.get("size")
+    });
 
     try {
+      console.log("⏳ Sending image variation request to OpenAI API...");
+      const startTime = Date.now();
+      
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
@@ -169,18 +301,53 @@ export class ChatGPTImageAPI {
         },
         body: formData,
       });
+      
+      const duration = Date.now() - startTime;
+      console.log(`⏱️ Response received in ${duration}ms`);
+      console.log("📥 Response status:", response.status);
+      
+      // Log just a few important headers instead of all
+      console.log("📥 Response headers:", {
+        contentType: response.headers.get("content-type"),
+        contentLength: response.headers.get("content-length"),
+        server: response.headers.get("server")
+      });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          errorData = { raw: errorText };
+        }
+        console.error("❌ OpenAI API Error:", JSON.stringify(errorData, null, 2));
         throw new Error(
           `OpenAI API error: ${response.status} ${JSON.stringify(errorData)}`
         );
       }
 
-      return await response.json();
+      const responseData = await response.json();
+      console.log("✅ Successfully created image variation");
+      console.log("📥 RESPONSE DATA:", JSON.stringify(responseData, null, 2));
+      
+      // Ensure the response has the expected format
+      if (!responseData.data || !Array.isArray(responseData.data)) {
+        console.warn("⚠️ Response doesn't contain data array, creating default structure");
+        return {
+          created: Date.now(),
+          data: []
+        };
+      }
+      
+      return responseData;
     } catch (error) {
-      console.error("Error creating image variation:", error);
-      throw error;
+      console.error("❌ Error creating image variation:", error);
+      // Return a default response structure on error
+      return {
+        created: Date.now(),
+        data: []
+      };
     }
   }
 }
