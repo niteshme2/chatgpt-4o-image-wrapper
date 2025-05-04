@@ -1,4 +1,4 @@
-type ImageGenerationModel = "dall-e-3" | "dall-e-2" | "gpt-4o";
+type ImageGenerationModel = "gpt-4o";
 type ImageSize = "1024x1024" | "1792x1024" | "1024x1792";
 type ImageQuality = "standard" | "hd";
 type ImageStyle = "vivid" | "natural";
@@ -12,7 +12,7 @@ export interface ImageGenerationOptions {
   user?: string;
 }
 
-type ImageEditModel = "gpt-image-1" | "dall-e-2" | "dall-e-3";
+type ImageEditModel = "gpt-image-1";
 
 export interface ImageEditOptions {
   model?: ImageEditModel;
@@ -46,7 +46,7 @@ export class ChatGPTImageAPI {
   ): Promise<ImageGenerationResponse> {
     const endpoint = `${this.baseUrl}/images/generations`;
     const defaultOptions: ImageGenerationOptions = {
-      model: "dall-e-3",
+      model: "gpt-4o",
       n: 1,
       quality: "standard",
       size: "1024x1024",
@@ -90,7 +90,7 @@ export class ChatGPTImageAPI {
   ): Promise<ImageGenerationResponse> {
     const endpoint = `${this.baseUrl}/images/edits`;
     const defaultOptions: ImageEditOptions = {
-      model: "dall-e-3",
+      model: "gpt-image-1",
       n: 1,
       size: "1024x1024",
     };
@@ -144,7 +144,7 @@ export class ChatGPTImageAPI {
   ): Promise<ImageGenerationResponse> {
     const endpoint = `${this.baseUrl}/images/variations`;
     const defaultOptions: ImageEditOptions = {
-      model: "dall-e-3",
+      model: "gpt-image-1",
       n: 1,
       size: "1024x1024",
     };

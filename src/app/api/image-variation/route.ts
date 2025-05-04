@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     const size = formData.get("size") as string;
     
     const options = {
-      model: model as "gpt-image-1" | "dall-e-2" | "dall-e-3" | undefined,
+      model: model as "gpt-image-1" | undefined,
       n,
       size: size as "1024x1024" | "1792x1024" | "1024x1792" | undefined,
     };

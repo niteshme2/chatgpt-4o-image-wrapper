@@ -17,7 +17,7 @@ export default function EditPage() {
   const [prompt, setPrompt] = useState("")
   const [sourceImage, setSourceImage] = useState<File | undefined>(undefined)
   const [maskImage, setMaskImage] = useState<File | undefined>(undefined)
-  const [model, setModel] = useState<string>("dall-e-3")
+  const [model, setModel] = useState<string>("gpt-image-1")
   const [size, setSize] = useState<string>("1024x1024")
   const [n, setN] = useState<number>(1)
   const [images, setImages] = useState<Array<{ url: string; revised_prompt?: string }>>([])
@@ -220,8 +220,6 @@ export default function EditPage() {
                         <SelectValue placeholder="Select model" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="dall-e-3">DALL-E 3</SelectItem>
-                        <SelectItem value="dall-e-2">DALL-E 2</SelectItem>
                         <SelectItem value="gpt-image-1">GPT Image</SelectItem>
                       </SelectContent>
                     </Select>

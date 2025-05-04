@@ -26,7 +26,7 @@ export function ImageOptionsForm({
   className,
   onOptionsChange,
 }: ImageOptionsFormProps) {
-  const [model, setModel] = React.useState<string>("dall-e-3")
+  const [model, setModel] = React.useState<string>("gpt-4o")
   const [size, setSize] = React.useState<string>("1024x1024")
   const [quality, setQuality] = React.useState<string>("standard")
   const [style, setStyle] = React.useState<string>("vivid")
@@ -54,8 +54,7 @@ export function ImageOptionsForm({
             <SelectValue placeholder="Select model" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="dall-e-3">DALL-E 3</SelectItem>
-            <SelectItem value="dall-e-2">DALL-E 2</SelectItem>
+            <SelectItem value="gpt-4o">GPT-4o</SelectItem>
           </SelectContent>
         </Select>
       </div>
